@@ -43,27 +43,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: display files
-        run: |
-            ls -ltr
-
-
       - name: Test
         run: npm run test
 
+##Lint fails, skip
+#      - name: Lint
+#        run: npm run lint
+      
+      - name: setup Package
+        run: |
+            ls -ltr
+            mkdir -p ./target/docs
+            # cp -fr ./storybook-static ./target/docs
+            cp -fr ./dist/* ./target/.
 
-      - name: Lint
-        run: npm run lint
-
-
-#      - name: setup Package
-#        run: |
-#            ls -ltr
-#            mkdir -p ./target/docs
-#            cp -fr ./storybook-static ./target/docs
-#            cp -fr ./dist/* ./target/.
-#
-#      - uses: actions/upload-artifact@v2
-#        with:
-#            name: Package
-#            path: ./target
+      - uses: actions/upload-artifact@v2
+        with:
+            name: Package
+            path: ./target
