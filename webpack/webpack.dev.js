@@ -1,16 +1,16 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
 
 module.exports = merge(common, {
     mode: 'development',
-    devtool: 'cheap-eval-source-map',
+    devtool: 'cheap-module-source-map',
     devServer: {
-        before(app, server) {
-            devServer = server;
-        },
-        contentBase: path.join(__dirname, '../dist'),
+        // before(app, server) {
+        //     devServer = server;
+        // },
+        // contentBase: path.join(__dirname, '../dist'),
         hot: true,
         host: '0.0.0.0',
         port: 8080
@@ -42,7 +42,7 @@ module.exports = merge(common, {
                             'search':/\.\/\?a=/g,
                             'replace':''
                         }
-                    }      
+                    }
                 ],
                 enforce:"post"
             }

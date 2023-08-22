@@ -1,4 +1,4 @@
-const glob = require('glob');
+const {glob} = require('glob');
 const fs = require('fs');
 var path = require("path");
 const apiDir = `./dist/api/service_finder`;

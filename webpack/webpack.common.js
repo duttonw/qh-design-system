@@ -4,6 +4,7 @@ const fs = require('fs');
 const glob = require('glob');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 // Our function that generates our html plugins
 function generateHtmlPlugins(templateDir) {
@@ -14,17 +15,19 @@ function generateHtmlPlugins(templateDir) {
             return file.indexOf('.html') > -1
         });
 
-    return templateFiles.map(item => {
-        // Split names and extension
-        const parts = item.split('.')
+    var htmlPlugins= new Array();
+    templateFiles.forEach((templateFile) => {
+        const parts = templateFile.split('.')
         const name = parts[0]
         const extension = parts[1]
-            // Create new HTMLWebpackPlugin with options
-        return new HtmlWebPackPlugin({
+
+        htmlPlugins.push(new HtmlWebPackPlugin({
             'filename': `${name}.html`,
-            'template': path.resolve(__dirname, `${templateDir}/${name}.${extension}`)
-        });
-    });
+            'template': path.resolve(__dirname, `${templateDir}/${name}.${extension}`)})
+        );
+
+    })
+    return htmlPlugins;
 }
 const htmlPlugins = generateHtmlPlugins('../src/html');
 
@@ -38,9 +41,9 @@ function reloadHtml() {
     };
 
     this.hooks.compilation.tap(plugin, compilation => {
-        compilation.hooks.htmlWebpackPluginAfterEmit.tap(plugin, data => {
+        HtmlWebPackPlugin.getHooks(compilation).beforeEmit.tap(plugin, data => {
             const orig = cache[data.outputName];
-            const html = data.html.source();
+            const html = data.html;
 
             // plugin seems to emit on any unrelated change?
             if (orig && orig !== html) {
@@ -52,18 +55,17 @@ function reloadHtml() {
     })
 }
 
-const copyWebPack = new CopyWebpackPlugin([
+const copyWebPack = new CopyWebpackPlugin( {
+    patterns: [
     {
         from: path.resolve(__dirname, '../src/externals'),
-        to: 'externals',
-        ignore: ['__What is this folder for']
+        to: 'externals'
     },
     {
         from: path.resolve(__dirname, '../src/assets'),
-        to: 'mysource_files',
-        ignore: ['__What is this folder for']
+        to: 'mysource_files'
     }
-])
+],})
 
 module.exports = {
     entry: {
@@ -87,7 +89,7 @@ module.exports = {
                     options: {
                         minimize: false,
                         sources:false,
-                        interpolate: true // allow HTML snippets with commonJs require tags
+                        // interpolate: true // allow HTML snippets with commonJs require tags
                     }
                 }]
             },
@@ -95,8 +97,7 @@ module.exports = {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 use: [
-                    "babel-loader",
-                    "eslint-loader"
+                    "babel-loader"
                 ]
             },
             { // Images
@@ -143,7 +144,12 @@ module.exports = {
             }
         ]
     },
-    plugins: htmlPlugins.concat(reloadHtml).concat(copyWebPack).concat(new MiniCssExtractPlugin()),
+    plugins: [
+        new ESLintPlugin({ extensions: ['jsx?'], exclude: [ '/node_modules/'] }),
+        ...htmlPlugins,
+        copyWebPack,
+        new MiniCssExtractPlugin(),
+    ],
     optimization: {
         minimize: false,
         runtimeChunk: 'single'

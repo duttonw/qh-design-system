@@ -1,7 +1,8 @@
-const merge = require('webpack-merge');
+const webpack = require('webpack');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const PrecompilePlugin = require('./PrecompilePlugin');
 const JsonMergePlugin = require('./JsonMergePlugin');
@@ -9,7 +10,7 @@ const JsonMergePlugin = require('./JsonMergePlugin');
 module.exports = env => {
 
     // Environment variables from script command
-    const env_minify = env.minify;
+    const env_minify = true;
     let minimize = false;
 
     // Conditional minification
@@ -39,18 +40,19 @@ module.exports = env => {
                         'options':{
                             helperDirs: path.resolve(__dirname, "../src/helpers/Handlebars")
                         },
-                    }    
+                    }
                 ],
                 enforce:"post",
-            }    
+            }
         ]
         },
         plugins: [
+            new webpack.ProgressPlugin(),
             new MiniCssExtractPlugin({
                 filename: "[name].css",
                 chunkFilename: "[name].css",
             }),
-            new CleanWebpackPlugin(['dist'], {}),
+            new CleanWebpackPlugin(),
             new PrecompilePlugin({
                 'input': './src/components/**/**/*.hbs',
                 'manifest':'./src/components/**/js/manifest.json',

@@ -1,4 +1,4 @@
-const glob = require('glob');
+const { globSync } = require('glob');
 const path = require('path');
 const Handlebars = require("handlebars");
 const fs = require('fs');
@@ -13,19 +13,21 @@ class PrecompilePlugin {
 
     apply(compiler) {
       const outputPath = this.options.output.endsWith('/') ? this.options.output.slice(0, -1) : this.options.output;
-      const hbsTemplates = glob.sync(this.options.input);
-      const hbsHelpers = glob.sync(this.options.helpersInput);
+      const hbsTemplates = globSync(this.options.input);
+      const hbsHelpers = globSync(this.options.helpersInput);
 
       let hbsHelpersFile = '';
 
+
       // For each of the handlebars helpers files
       hbsHelpers.forEach((helperPath) => {
+          console.log(helperPath, helperPath.split('/')[3].split('.')[0]);
 
         // Get the name of the helper from the file name
-        const helperName = helperPath.split('/')[4].split('.')[0];
+        const helperName = helperPath.split('/')[3].split('.')[0];
 
         // Import the function from the file, and get the correct reference for the JS file
-        let module = require(helperPath.replace('./src', '../src'));
+        let module = require(helperPath.replace('src', '../src'));
 
         // register the helper using the helper name and the imported function
         Handlebars.registerHelper(helperName, module);
@@ -53,13 +55,13 @@ class PrecompilePlugin {
 
       fs.writeFileSync(`./dist/js/helpers.js`, hbsHelpersFile);
 
-      compiler.plugin('done', (stats) => {
+      compiler.hooks.done.tap('PrecompilePlugin', (stats) => {
 
         // For each HBS template compile a Presentation and a static Version of the template;
 
 
         const siteData= fs.readFileSync('./src/data/site.json', 'utf8');
-        const currentData= fs.readFileSync('./src/data/current.json', 'utf8');       
+        const currentData= fs.readFileSync('./src/data/current.json', 'utf8');
         const siteDataParsed = JSON.parse(siteData);
         const currentDataParsed = JSON.parse(currentData);
 
@@ -69,8 +71,10 @@ class PrecompilePlugin {
           // Read the templates from the file system
           const templateDataPresentation = fs.readFileSync(templatePath, 'utf8');
 
+          console.log(templatePath, templatePath.split('/')[2])
           // Get the template name from the path
-          const templateName = templatePath.split('/')[3];
+          const templateName = templatePath.split('/')[2];
+
 
           // Make component directory
           fs.mkdirSync(`${outputPath}/${templateName}`, {
@@ -91,7 +95,7 @@ class PrecompilePlugin {
 
           //Action Manifest if it exists
           if(manifestData.length) {
-            //Parse manifest   
+            //Parse manifest
             const manifestDataParsed = JSON.parse(manifestData).component;
 
 
@@ -109,7 +113,7 @@ class PrecompilePlugin {
               'schema_id':rand(),
               'section_id':rand()
           };
-          
+
           //test if we have the data and metadata objects as children
           if(typeof(manifestDataXML.component.data) !== 'undefined' && typeof(manifestDataXML.component.data.metadata) !== 'undefined'){
             //grab the metadata fields
@@ -119,7 +123,7 @@ class PrecompilePlugin {
         }
 
           var XMLOutput = '';
-          
+
           //Header
           XMLOutput+=`<?xml version="1.0" encoding="utf-8"?>
           <actions>`
@@ -190,7 +194,7 @@ class PrecompilePlugin {
               <userid>[[system://public_user]]</userid>
           </action>
           `
-          //Section   
+          //Section
           XMLOutput+= `
           <action>
             <action_id>create_Metadata_Section_${idMap.section_id}</action_id>
@@ -223,13 +227,13 @@ class PrecompilePlugin {
               <permission>1</permission>
               <granted>1</granted>
               <userid>[[system://public_user]]</userid>
-          </action>           
+          </action>
           `
-          //Fields          
+          //Fields
           //for(const field in manifestDataXML['data']) {
         if(typeof(manifestDataXML.component.data) !== 'undefined' && typeof(manifestDataXML.component.data.metadata) !== 'undefined'){
           for(const field in manifestDataXML['component']['data']['metadata']) {
-              
+
               var f =  manifestDataXML['component']['data']['metadata'][field];
               //Field
               XMLOutput+= `
@@ -242,7 +246,7 @@ class PrecompilePlugin {
                   <value></value>
                   <is_dependant>1</is_dependant>
                   <is_exclusive>0</is_exclusive>
-              </action> 
+              </action>
               <action>
                   <action_id>set_${f.type}_${idMap[field]}_name</action_id>
                   <action_type>set_attribute_value</action_type>
@@ -328,7 +332,7 @@ class PrecompilePlugin {
                       'empty_text' => '',
                       'extras' => '',
                       );]]></value>
-                  </action>  
+                  </action>
                   `
               }
             }

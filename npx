@@ -1,0 +1,5 @@
+#!/bin/sh
+export PATH="$PWD/node/":$PATH
+node -v
+npx -v
+$PWD/node/npx "$@"
