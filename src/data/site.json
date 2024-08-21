@@ -304,7 +304,7 @@
 			"editable": true
 		},
 		"siteTitle": {
-			"value": "Queensland Design System Starter",
+			"value": "Queensland Government Design System: Vanilla",
 			"fieldid": "72384",
 			"type": "metadata_field_text",
 			"is_contextable": true,
@@ -604,7 +604,7 @@
 			}
 		},
 		"footerSiteTitle": {
-			"value": "Queensland Design System",
+			"value": "Queensland Government Design System: Vanilla",
 			"fieldid": "72409",
 			"type": "metadata_field_text",
 			"is_contextable": true,
@@ -700,17 +700,9 @@
 			"use_default": true
 		},
 		"footerCopyrightMessage": {
-			"value": "© The State of Queensland 1995-2022 (Organisation) Queensland Government",
+			"value": "© The State of Queensland 1995-2024 (Organisation) Queensland Government",
 			"fieldid": "72421",
 			"type": "metadata_field_text",
-			"is_contextable": true,
-			"default_value": true,
-			"use_default": true
-		},
-		"footerLogoLink": {
-			"value": "asasdfasdfasdfasd",
-			"fieldid": "https://www.google.com",
-			"type": "metadata_field_related_asset",
 			"is_contextable": true,
 			"default_value": true,
 			"use_default": true
@@ -794,7 +786,6 @@
 		"asset_name": "Components &",
 		"asset_short_name": "Components &",
 		"asset_metadata_shortDescription": "This is level one short description",
-		"asset_metadata_showInMegaNav": "false",
 		"children": [{
 			"asset_url": "/components.html",
 			"asset_assetid":"14418",
@@ -842,7 +833,6 @@
 		"asset_url": "/inner.html",
 		"asset_name": "Inner",
 		"asset_short_name": "Inner",
-		"asset_metadata_showInMegaNav": "true",
     	"children": []
   	}
 	]
